@@ -71,14 +71,29 @@ def randomAssignment(M, cs):
 
     return assignment
 
+# Saving assignment to file
+# type :: ([int], string) -> None
+def saveAssignment(locs_ids, ants_ids, assignment, file_name):
+    n_ants = len(assignment)
+
+    f = open(file_name, 'w')
+
+    for i in range(n_ants):
+        f.write( "{:s};{:s}\n".format(ants_ids[i], locs_ids[assignment[i]]) )
+
+    f.close()
+
 # Testing the code
 # type :: string -> None
 def main(input_lines = None):
-    if len(input_lines) == None:
+    if input_lines == None:
         from random import randint, random
 
         n_locs = 30   # number of locations
         n_ants = 40000  # number of aspirants
+
+        locs_ids = ["{:02d}".format(i) for i in range(n_locs)]
+        ants_ids = ["{:05d}".format(i) for i in range(n_ants)]
 
         # Creating random capacities
         cpcties = [randint(20, 1700) for i in range(n_locs)]
@@ -89,23 +104,12 @@ def main(input_lines = None):
         locations = [(random(), random()) for i in range(n_locs)]
         aspirants = [(random(), random()) for i in range(n_ants)]
 
-        # saving random test
-        #f = open('large_example.csv', 'w')
-        #f.write( "{:d};{:d}\n".format(n_locs, n_ants) )
-        #
-        #for i in range(n_locs):
-        #    x, y = locations[i]
-        #    f.write( "{:02d};{:d};{:f};{:f}\n".format(i, cpcties[i], x, y))
-        #
-        #for i in range(n_ants):
-        #    x, y = aspirants[i]
-        #    f.write( "{:05d};{:f};{:f}\n".format(i, x, y))
-        #
-        #f.close()
-
     else:
         n_locs, n_ants = input_lines[0].split(";")
         n_locs, n_ants = int(n_locs), int(n_ants)
+
+        locs_ids = [ loc.split(";")[0] for loc in input_lines[1:n_locs+1] ]
+        ants_ids = [ asp.split(";")[0] for asp in input_lines[n_locs+1:] ]
 
         cpcties = [ int(loc.split(";")[1]) for loc in input_lines[1:n_locs+1] ]
 
@@ -131,6 +135,9 @@ def main(input_lines = None):
     print( " == Mean distance == ")
     print( "Assignment (greedy): {:f}".format(distance) )
     print( "Assignment (random): {:f}".format(distance2) )
+
+    print( "Saving (greedy) assignment" )
+    saveAssignment(locs_ids, ants_ids, assignment, "greedy_assignment.csv")
 
 
 def mode_of_use():
