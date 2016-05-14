@@ -72,20 +72,49 @@ def randomAssignment(M, cs):
     return assignment
 
 # Testing the code
-def main():
-    from random import randint, random
+# type :: string -> None
+def main(input_lines = None):
+    if len(input_lines) == None:
+        from random import randint, random
 
-    n_ants = 40000  # number of aspirants
-    n_locs = 30   # number of locations
+        n_locs = 30   # number of locations
+        n_ants = 40000  # number of aspirants
 
-    # Creating random capacities
-    cpcties = [randint(20, 1700) for i in range(n_locs)]
-    while sum(cpcties) < n_ants:
-        cpcties = [c+10 for c in cpcties]
+        # Creating random capacities
+        cpcties = [randint(20, 1700) for i in range(n_locs)]
+        while sum(cpcties) < n_ants:
+            cpcties = [c+10 for c in cpcties]
 
-    # Creating random (x,y) coordinates for Locations and aspirants
-    locations = [(random(), random()) for i in range(n_locs)]
-    aspirants = [(random(), random()) for i in range(n_ants)]
+        # Creating random (x,y) coordinates for Locations and aspirants
+        locations = [(random(), random()) for i in range(n_locs)]
+        aspirants = [(random(), random()) for i in range(n_ants)]
+
+        # saving random test
+        #f = open('large_example.csv', 'w')
+        #f.write( "{:d};{:d}\n".format(n_locs, n_ants) )
+        #
+        #for i in range(n_locs):
+        #    x, y = locations[i]
+        #    f.write( "{:02d};{:d};{:f};{:f}\n".format(i, cpcties[i], x, y))
+        #
+        #for i in range(n_ants):
+        #    x, y = aspirants[i]
+        #    f.write( "{:05d};{:f};{:f}\n".format(i, x, y))
+        #
+        #f.close()
+
+    else:
+        n_locs, n_ants = input_lines[0].split(";")
+        n_locs, n_ants = int(n_locs), int(n_ants)
+
+        cpcties = [ int(loc.split(";")[1]) for loc in input_lines[1:n_locs+1] ]
+
+        # line to coordinates
+        # type :: [string] -> (float, float)
+        toCoord = lambda l: (float(l[0]), float(l[1]))
+
+        locations = [ toCoord(loc.split(";")[2:]) for loc in input_lines[1:n_locs+1] ]
+        aspirants = [ toCoord(asp.split(";")[1:]) for asp in input_lines[n_locs+1:] ]
 
     # Creating matrix with distances from aspirants to locations
     M = [ [d(locations[l], a) for l in range(n_locs)]
@@ -104,11 +133,23 @@ def main():
     print( "Assignment (random): {:f}".format(distance2) )
 
 
+def mode_of_use():
+    print("Mode of use: python3 {:s} [-i|--input inputfile.txt]\n".format( argv[0] ) )
+    print("  Input file format: \n"+
+          "  line | content                                          \n"+
+          " ----- | -------------------------------------------------\n"+
+          "     1 | number_of_locations; number_of_aspirants         \n"+
+          "   n+1 | location_n_capacity; location_n_x_coord; y_coord \n"+
+          "       | ...                                              \n"+
+          " n+m+1 | aspirant_m_id; aspirant_m_x_coord; y_coord")
+    exit(1)
+
 if __name__ == "__main__":
     from sys import argv
 
-    if len(argv) > 1:
-        print("Mode of use: python3", argv[0])
-        exit(1)
-
-    main()
+    if len(argv) == 1:
+        main()
+    elif len(argv) == 3 and argv[1] in ['-i', '--input']:
+        main( open(argv[2], 'r').readlines() )
+    else:
+        mode_of_use()
